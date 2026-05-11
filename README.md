@@ -1,130 +1,152 @@
 # MedicalChatbot
 
-# How to run?
-### STEPS:
+MedicalChatbot is a Flask-based medical question-answering app that uses LangChain, OpenAI, and Pinecone to answer questions from indexed PDF documents.
 
-Clone the repository
+## What this project does
+
+- Loads PDF files from the `data` folder
+- Splits the content into chunks and stores embeddings in Pinecone
+- Serves a chat UI with Flask
+- Answers questions using retrieval-augmented generation over your indexed documents
+
+## Project structure
+
+```text
+MedicalChatbot/
+├── app.py                  # Flask app and chat endpoints
+├── store_index.py          # Loads PDFs and uploads embeddings to Pinecone
+├── data/                   # Source PDF files
+├── templates/chat.html     # Chat UI template
+├── static/chat.css         # Chat UI styles
+├── static/chat.js          # Chat UI behavior
+└── src/
+    ├── helper.py           # PDF loading, splitting, embeddings
+    └── prompt.py           # System prompt for the chatbot
+```
+
+## Requirements
+
+- Python 3.13
+- A Pinecone account and API key
+- An OpenAI API key
+
+## Setup
+
+### 1. Clone the repository
 
 ```bash
-git clonehttps://github.com/itlivepravin/MedicalChatbot.git
+git clone https://github.com/itlivepravin/MedicalChatbot.git
+cd MedicalChatbot
 ```
-### STEP 01- Create a conda environment after opening the repository
+
+### 2. Create and activate a virtual environment
+
+Windows PowerShell:
+
+```powershell
+python -m venv medibot
+.\medibot\Scripts\Activate.ps1
+```
+
+macOS/Linux:
 
 ```bash
-conda create -n medibot python=3.13.13 -y
+python -m venv medibot
+source medibot/bin/activate
 ```
 
-```bash
-conda activate medibot
-```
+### 3. Install dependencies
 
-
-### STEP 02- install the requirements
 ```bash
 pip install -r requirements.txt
 ```
 
-
-### Create a `.env` file in the root directory and add your Pinecone & openai credentials as follows:
+### 4. Create a `.env` file in the project root
 
 ```ini
-PINECONE_API_KEY = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-OPENAI_API_KEY = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+PINECONE_API_KEY="your-pinecone-api-key"
+OPENAI_API_KEY="your-openai-api-key"
 ```
 
+## Add your documents
+
+Place your PDF files inside the `data` folder.
+
+The current project already includes:
+
+- `data/Medical_book.pdf`
+
+## Build the Pinecone index
+
+Run the indexing script once after adding or changing PDF files:
 
 ```bash
-# run the following command to store embeddings to pinecone
 python store_index.py
 ```
 
+What this does:
+
+- Reads PDFs from `./data`
+- Splits them into chunks
+- Generates embeddings using `sentence-transformers/all-MiniLM-L6-v2`
+- Creates or updates the Pinecone index named `medical-chatbot`
+
+## Run the application
+
 ```bash
-# Finally run the following command
 python app.py
 ```
 
-Now,
-```bash
-open up localhost:
+The Flask app starts on:
+
+```text
+http://localhost:8080
 ```
 
+## Available routes
 
-### Techstack Used:
+- `GET /` renders the chatbot UI
+- `POST /chat` accepts a message and returns the generated answer and document sources
+
+Example request body for the chat endpoint:
+
+```json
+{
+  "message": "What does the document say about diabetes management?"
+}
+```
+
+## Tech stack
 
 - Python
-- LangChain
 - Flask
-- GPT
+- LangChain
+- OpenAI
 - Pinecone
+- Sentence Transformers
 
+## Troubleshooting
 
+### Missing API keys
 
-# AWS-CICD-Deployment-with-Github-Actions
+If you see an error about missing `PINECONE_API_KEY` or `OPENAI_API_KEY`, check that your `.env` file exists in the project root and contains both keys.
 
-## 1. Login to AWS console.
+### Empty or weak answers
 
-## 2. Create IAM user for deployment
+- Make sure `python store_index.py` completed successfully
+- Confirm your PDFs are present in the `data` folder
+- Rebuild the index after changing documents
 
-	#with specific access
+### Dependency issues
 
-	1. EC2 access : It is virtual machine
+If your environment is outdated or partially installed, reactivate it and run:
 
-	2. ECR: Elastic Container registry to save your docker image in aws
+```bash
+pip install -r requirements.txt
+```
 
+## Notes
 
-	#Description: About the deployment
-
-	1. Build docker image of the source code
-
-	2. Push your docker image to ECR
-
-	3. Launch Your EC2 
-
-	4. Pull Your image from ECR in EC2
-
-	5. Lauch your docker image in EC2
-
-	#Policy:
-
-	1. AmazonEC2ContainerRegistryFullAccess
-
-	2. AmazonEC2FullAccess
-
-	
-## 3. Create ECR repo to store/save docker image
-    - Save the URI: 315865595366.dkr.ecr.us-east-1.amazonaws.com/medicalbot
-
-	
-## 4. Create EC2 machine (Ubuntu) 
-
-## 5. Open EC2 and Install docker in EC2 Machine:
-	
-	
-	#optinal
-
-	sudo apt-get update -y
-
-	sudo apt-get upgrade
-	
-	#required
-
-	curl -fsSL https://get.docker.com -o get-docker.sh
-
-	sudo sh get-docker.sh
-
-	sudo usermod -aG docker ubuntu
-
-	newgrp docker
-	
-# 6. Configure EC2 as self-hosted runner:
-    setting>actions>runner>new self hosted runner> choose os> then run command one by one
-
-
-# 7. Setup github secrets:
-
-   - AWS_ACCESS_KEY_ID
-   - AWS_SECRET_ACCESS_KEY
-   - AWS_DEFAULT_REGION
-   - ECR_REPO
-   - PINECONE_API_KEY
-   - OPENAI_API_KEY
+- The chat UI uses `templates/chat.html`, `static/chat.css`, and `static/chat.js`
+- The current Flask app uses the `gpt-4o-mini` model in `app.py`
+- The retrieval pipeline uses the prompt defined in `src/prompt.py`

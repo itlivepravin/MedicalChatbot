@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Medical Chatbot</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='chat.css') }}">
+</head>
+<body>
+	<main class="shell">
+		<aside class="hero">
+			<div>
+				<div class="eyebrow">Medical Knowledge Assistant</div>
+				<h1>Ask the documents, not the void.</h1>
+			</div>
+			<p>
+				This interface sends your question to the Flask app, retrieves relevant document chunks from Pinecone,
+				and answers with the context stored for this project.
+			</p>
+			<section class="note">
+				<strong>Good prompts</strong>
+				Be specific. Ask about symptoms, treatments, side effects, dosage guidance, or definitions found in your uploaded PDFs.
+			</section>
+			<section class="note">
+				<strong>Response style</strong>
+				The backend is set to answer briefly and admit when the indexed documents do not contain the answer.
+			</section>
+		</aside>
+
+		<section class="chat-panel">
+			<header class="chat-header">
+				<div>
+					<h2>Chat Session</h2>
+					<p>Ask a question and the app will respond using your indexed medical documents.</p>
+				</div>
+				<div class="status" id="status">Ready</div>
+			</header>
+
+			<div class="messages" id="messages">
+				<article class="message bot">
+					<span class="message-label">Assistant</span>
+					Hello. Ask a medical question based on the documents you indexed with <code>store_index.py</code>.
+				</article>
+			</div>
+
+			<section class="composer">
+				<form id="chat-form">
+					<label for="message" class="sr-only"></label>
+					<textarea
+						id="message"
+						name="message"
+						placeholder="What does the document say about diabetes management?"
+						required
+					></textarea>
+					<button type="submit" id="send-button">Send</button>
+				</form>
+				<div class="footer-text">Enter sends the message. Shift+Enter adds a new line.</div>
+			</section>
+		</section>
+	</main>
+
+	<script src="{{ url_for('static', filename='chat.js') }}"></script>
+</body>
+</html>
