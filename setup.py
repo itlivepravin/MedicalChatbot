@@ -9,6 +9,7 @@ setup(
     install_requires=[
         'langchain==0.3.26',
         'Flask==3.1.1',
+        'gunicorn==23.0.0',
         'sentence-transformers==4.1.0',
         'langchain-huggingface==0.1.2',
         'pypdf==5.6.1',

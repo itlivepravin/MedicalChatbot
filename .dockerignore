@@ -1,0 +1,13 @@
+.git
+.github
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.ipynb_checkpoints
+medibot/
+research/
+.env
+*.egg-info/
+build/
+dist/
